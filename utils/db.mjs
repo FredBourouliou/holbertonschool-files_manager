@@ -1,4 +1,6 @@
-import { MongoClient } from 'mongodb';
+import pkg from 'mongodb';
+
+const { MongoClient } = pkg;
 
 class DBClient {
   constructor() {
@@ -11,18 +13,21 @@ class DBClient {
     this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.dbName = database;
     this.db = null;
+    this.connected = false;
 
     this.client.connect()
       .then(() => {
         this.db = this.client.db(this.dbName);
+        this.connected = true;
       })
       .catch((err) => {
         console.error(`MongoDB connection error: ${err.message}`);
+        this.connected = false;
       });
   }
 
   isAlive() {
-    return this.client && this.client.isConnected();
+    return this.connected;
   }
 
   async nbUsers() {
